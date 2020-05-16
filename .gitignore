@@ -130,3 +130,5 @@ dmypy.json
 
 # Intellij
 .idea
+data/main/output
+demonstration/data

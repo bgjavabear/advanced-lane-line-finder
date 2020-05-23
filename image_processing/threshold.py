@@ -47,21 +47,18 @@ def dir_threshold(S, sobel_kernel=3, thresh=(0, np.pi / 2)):
     return binary
 
 
+def color_threshold(img, thresh_min=(0, 0, 0), thresh_max=(255, 255, 255)):
+    img1 = img[:, :, 0]
+    img2 = img[:, :, 1]
+    img3 = img[:, :, 2]
+    binary = np.zeros_like(img1)
+    binary[((img1 >= thresh_min[0]) & (img1 <= thresh_max[0])) |
+           ((img2 >= thresh_min[1]) & (img2 <= thresh_max[1])) |
+           ((img3 >= thresh_min[2]) & (img3 <= thresh_max[2]))] = 1
+    return binary
+
+
 def channel_threshold(channel, thresh=(0, 255)):
     binary = np.zeros_like(channel)
     binary[(channel >= thresh[0]) & (channel <= thresh[1])] = 1
     return binary
-
-
-def find_line_edges(img, saturation_threshold=(0, 255), sobel_threshold=(0, 255), direction_threshold=(0, np.pi / 2)):
-    hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
-    S = hls[:, :, 2]
-    # saturation threshold
-    saturation_binary = channel_threshold(S, thresh=saturation_threshold)
-    # sobel threshold
-    sobel_binary = abs_sobel_thresh(S, thresh=sobel_threshold)
-    # direction threshold
-    direction_binary = dir_threshold(S, thresh=direction_threshold)
-    combined = np.zeros_like(S)
-    combined[((saturation_binary == 1) & (sobel_binary == 1) & (direction_binary == 1))] = 1
-    return combined

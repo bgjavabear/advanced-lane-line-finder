@@ -1,7 +1,7 @@
 import glob
 import cv2
 from image_processing.calibration import calibrate_camera
-from image_processing.threshold import find_line_edges
+from image_processing.image_processing import find_line_edges
 import numpy as np
 
 # Compute the camera calibration matrix and distortion coefficients given a set of chessboard images
@@ -23,5 +23,4 @@ for filename in test_images:
     img = cv2.imread(filename)
     # Apply a distortion correction to raw images
     undistorted_img = cv2.undistort(img, mtx, dist, None, mtx)
-    line_edges = find_line_edges(undistorted_img, saturation_threshold=(170, 255), sobel_threshold=(20, 100),
-                                 direction_threshold=(0, np.pi / 2))
+    line_edges = find_line_edges(undistorted_img)

@@ -17,7 +17,7 @@ dist = calibration_result["dist"]
 rvecs = calibration_result["rvecs"]
 tvecs = calibration_result["tvecs"]
 
-img = mpimg.imread('../data/main/test_images/test4.jpg')
+img = mpimg.imread('../data/main/camera_cal/calibration1.jpg')
 # Apply a distortion correction to raw images
 undistorted_img = cv2.undistort(img, mtx, dist, None, mtx)
 

@@ -15,11 +15,10 @@ def pipeline(img_path):
     calibration_result = calibrate_camera(chessboard_images, (nx, ny))
     mtx = calibration_result["mtx"]
     dist = calibration_result["dist"]
-    # Apply a distortion correction to raw images
 
     img = cv2.imread(img_path)
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     undistorted_img = cv2.undistort(img, mtx, dist, None, mtx)
+    img_rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
     binary = find_line_edges(undistorted_img, yellow_thresh=(155, 255), white_thresh=((230, 230, 230), (255, 255, 255)))
     line_edges = np.dstack((binary, binary, binary)) * 255
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))

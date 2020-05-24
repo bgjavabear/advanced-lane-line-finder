@@ -10,7 +10,7 @@ def perspective_transform(source):
     left_line, right_line = hough_transformation(source)
     src = np.float32([[left_line.x1, left_line.y1], [left_line.x2, left_line.y2], [right_line.x2, right_line.y2],
                       [right_line.x1, right_line.y1]])
-    dst = np.float32([[100, 1200], [100, 600], [400, 600], [400, 1200]])
+    dst = np.float32([[200, 1200], [200, 600], [600, 600], [600, 1200]])
     M = cv2.getPerspectiveTransform(src, dst)
     warped = cv2.warpPerspective(source, M, source.shape, flags=cv2.INTER_LINEAR)
     return warped, M

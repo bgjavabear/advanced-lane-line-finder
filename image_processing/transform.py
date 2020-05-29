@@ -10,7 +10,7 @@ def perspective_transform(source):
     left_line, right_line = hough_transformation(source)
     src = np.float32([[left_line.x1, left_line.y1], [left_line.x2, left_line.y2], [right_line.x2, right_line.y2],
                       [right_line.x1, right_line.y1]])
-    dst = np.float32([[200, 700], [200, 100], [1000, 100], [1000, 700]])
+    dst = np.float32([[200, 700], [200, 300], [1000, 300], [1000, 700]])
     M = cv2.getPerspectiveTransform(src, dst)
     warped = cv2.warpPerspective(source, M, source.shape[::-1], flags=cv2.INTER_LINEAR)
     return warped, M, src, dst
@@ -37,13 +37,13 @@ def hough_transformation(source, rho=1, theta=np.pi / 180, threshold=20, min_lin
             rad = math.atan2(y2 - y1, x2 - x1)
             angle = rad * 180 / math.pi
             angles = np.append(angles, angle)
-            if angle < 0:
+            if angle < -10:
                 left_line = Line(x1, y1, x2, y2)
                 y = source_shape[0]
                 x = left_line.calculate_x(y)
                 left_x_arr = np.append(left_x_arr, x)
                 left_line_angle_arr = np.append(left_line_angle_arr, angle)
-            elif angle > 0:
+            elif angle > 10:
                 right_line = Line(x1, y1, x2, y2)
                 y = source_shape[0]
                 x = right_line.calculate_x(y)
@@ -56,8 +56,8 @@ def hough_transformation(source, rho=1, theta=np.pi / 180, threshold=20, min_lin
     left_line_angle = np.average(left_line_angle_arr)
     right_line_angle = np.average(right_line_angle_arr)
 
-    y2_right = source_shape[0] * .7
-    y2_left = source_shape[0] * .7
+    y2_right = source_shape[0] * .65
+    y2_left = source_shape[0] * .65
 
     x2_right = calculate_x_by_angle(x1_right, source_shape[0], y2_right, right_line_angle)
     x2_left = calculate_x_by_angle(x1_left, source_shape[0], y2_left, left_line_angle)

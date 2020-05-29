@@ -1,12 +1,12 @@
 import glob
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-
+import matplotlib.pyplot as plt
 from image_processing.calibration import calibrate_camera
-from image_processing.transform import hough_transformation
 from image_processing.image_processing import find_line_edges
+from image_processing.transform import perspective_transform
+from image_processing.sliding_window import fit_polynomial
 
 chessboard_images = glob.glob('../data/main/camera_cal/*.jpg')
 nx = 9  # chessboard corners in x direction
@@ -20,16 +20,22 @@ img_rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
 binary = find_line_edges(undistorted_img, yellow_thresh=(155, 255), white_thresh=((190, 190, 190), (255, 255, 255)))
 lines_img = np.dstack((binary, binary, binary)) * 255
 
-left_line, right_line = hough_transformation(binary)
+warped, M, src, dst = perspective_transform(binary)
 
-cv2.line(img_rgb, (left_line.x1, left_line.y1), (left_line.x2, left_line.y2), (250, 0, 0), 10)
-cv2.line(img_rgb, (right_line.x1, right_line.y1), (right_line.x2, right_line.y2), (250, 0, 0), 10)
+left_fitx, right_fitx, ploty, out_img = fit_polynomial(warped)
 
-f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
-f.tight_layout()
+f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(24, 9))
+
 ax1.imshow(img_rgb)
 ax1.set_title('Original Image', fontsize=50)
+
 ax2.imshow(lines_img)
-ax2.set_title('Threshold', fontsize=50)
-plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+ax2.set_title('Binary', fontsize=50)
+
+ax3.plot(left_fitx, ploty, color='yellow')
+ax3.plot(right_fitx, ploty, color='yellow')
+ax3.imshow(out_img)
+
+ax4.imshow(warped, cmap='gray')
+ax4.set_title('Warped', fontsize=50)
 plt.show()

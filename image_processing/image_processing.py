@@ -1,8 +1,7 @@
 import cv2
-import numpy as np
 
-from image_processing.threshold import color_threshold, channel_threshold
 from image_processing.mask import get_vertices, apply_mask
+from image_processing.threshold import color_threshold, channel_threshold
 
 
 def find_line_edges(img, yellow_thresh=(0, 255), white_thresh=((0, 0, 0), (255, 255, 255)),

@@ -1,19 +1,14 @@
+from image_processing.lane_histogram import hist
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 
-def find_lane_pixels(binary_warped):
-    # Take a histogram of the bottom half of the image
-    histogram = np.sum(binary_warped[binary_warped.shape[0] // 2:, :], axis=0)
-    # Create an output image to draw on and visualize the result
+def sliding_window(binary_warped):
     out_img = np.dstack((binary_warped, binary_warped, binary_warped))
-    # Find the peak of the left and right halves of the histogram
-    # These will be the starting point for the left and right lines
+    histogram = hist(binary_warped)
     midpoint = np.int(histogram.shape[0] // 2)
-    leftx_base = np.argmax(histogram[:midpoint])  # 386
-    rightx_base = np.argmax(histogram[midpoint:]) + midpoint  # 1533
+    leftx_base = np.argmax(histogram[:midpoint])
+    rightx_base = np.argmax(histogram[midpoint:]) + midpoint
 
     # HYPERPARAMETERS
     # Choose the number of sliding windows
@@ -23,12 +18,13 @@ def find_lane_pixels(binary_warped):
     # Set minimum number of pixels found to recenter window
     minpix = 50
 
-    # Set height of windows - based on nwindows above and image shape
     window_height = np.int(binary_warped.shape[0] // nwindows)
-    # Identify the x and y positions of all nonzero pixels in the image
+
+    # Identify the x,y coordinates of all nonzero pixels in the image
     nonzero = binary_warped.nonzero()
     nonzeroy = np.array(nonzero[0])
     nonzerox = np.array(nonzero[1])
+
     # Current positions to be updated later for each window in nwindows
     leftx_current = leftx_base
     rightx_current = rightx_base
@@ -37,7 +33,6 @@ def find_lane_pixels(binary_warped):
     left_lane_inds = []
     right_lane_inds = []
 
-    # Step through the windows one by one
     for window in range(nwindows):
         # Identify window boundaries in x and y (and right and left)
         win_y_low = binary_warped.shape[0] - (window + 1) * window_height
@@ -48,7 +43,6 @@ def find_lane_pixels(binary_warped):
         win_xright_low = rightx_current - margin
         win_xright_high = rightx_current + margin
 
-        # Draw the windows on the visualization image
         cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high), (0, 255, 0), 2)
         cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high), (0, 255, 0), 2)
 
@@ -67,15 +61,9 @@ def find_lane_pixels(binary_warped):
         if len(good_right_inds) > minpix:
             rightx_current = np.int(np.mean(nonzerox[good_right_inds]))
 
-    # Concatenate the arrays of indices (previously was a list of lists of pixels)
-    try:
-        left_lane_inds = np.concatenate(left_lane_inds)
-        right_lane_inds = np.concatenate(right_lane_inds)
-    except ValueError:
-        # Avoids an error if the above is not implemented fully
-        pass
+    left_lane_inds = np.concatenate(left_lane_inds)
+    right_lane_inds = np.concatenate(right_lane_inds)
 
-    # Extract left and right line pixel positions
     leftx = nonzerox[left_lane_inds]
     lefty = nonzeroy[left_lane_inds]
     rightx = nonzerox[right_lane_inds]
@@ -85,14 +73,9 @@ def find_lane_pixels(binary_warped):
 
 
 def fit_polynomial(binary_warped):
-    # Find our lane pixels first
-    leftx, lefty, rightx, righty, out_img = find_lane_pixels(binary_warped)
-
-    # Fit a second order polynomial to each using `np.polyfit`
+    leftx, lefty, rightx, righty, out_img = sliding_window(binary_warped)
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
-
-    # Generate x and y values for plotting
     ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
     try:
         left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
@@ -103,21 +86,6 @@ def fit_polynomial(binary_warped):
         left_fitx = 1 * ploty ** 2 + 1 * ploty
         right_fitx = 1 * ploty ** 2 + 1 * ploty
 
-    ## Visualization ##
-    # Colors in the left and right lane regions
     out_img[lefty, leftx] = [255, 0, 0]
     out_img[righty, rightx] = [0, 0, 255]
-
-    # Plots the left and right polynomials on the lane lines
-    plt.plot(left_fitx, ploty, color='yellow')
-    plt.plot(right_fitx, ploty, color='yellow')
-
-    return out_img
-
-
-binary_warped = mpimg.imread('../data/lane_histogram/warped_example.jpg')[:, :, 0]
-
-out_img = fit_polynomial(binary_warped)
-
-plt.imshow(out_img)
-plt.show()
+    return left_fitx, right_fitx, ploty, out_img

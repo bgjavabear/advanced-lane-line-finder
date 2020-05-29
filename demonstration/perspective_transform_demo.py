@@ -13,7 +13,7 @@ ny = 6  # chessboard corners in y direction
 calibration_result = calibrate_camera(chessboard_images, (nx, ny))
 mtx = calibration_result["mtx"]
 dist = calibration_result["dist"]
-img = cv2.imread('../data/main/test_images/test5.jpg')
+img = cv2.imread('../data/main/test_images/test1.jpg')
 undistorted_img = cv2.undistort(img, mtx, dist, None, mtx)
 img_rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
 binary = find_line_edges(undistorted_img, yellow_thresh=(155, 255), white_thresh=((190, 190, 190), (255, 255, 255)))

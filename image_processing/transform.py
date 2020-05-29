@@ -10,10 +10,10 @@ def perspective_transform(source):
     left_line, right_line = hough_transformation(source)
     src = np.float32([[left_line.x1, left_line.y1], [left_line.x2, left_line.y2], [right_line.x2, right_line.y2],
                       [right_line.x1, right_line.y1]])
-    dst = np.float32([[200, 1200], [200, 600], [600, 600], [600, 1200]])
+    dst = np.float32([[200, 700], [200, 100], [1000, 100], [1000, 700]])
     M = cv2.getPerspectiveTransform(src, dst)
-    warped = cv2.warpPerspective(source, M, source.shape, flags=cv2.INTER_LINEAR)
-    return warped, M
+    warped = cv2.warpPerspective(source, M, source.shape[::-1], flags=cv2.INTER_LINEAR)
+    return warped, M, src, dst
 
 
 def hough_transformation(source, rho=1, theta=np.pi / 180, threshold=20, min_line_length=0, max_line_gap=40):

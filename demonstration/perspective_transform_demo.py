@@ -19,7 +19,17 @@ img_rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
 binary = find_line_edges(undistorted_img, yellow_thresh=(155, 255), white_thresh=((190, 190, 190), (255, 255, 255)))
 lines_img = np.dstack((binary, binary, binary)) * 255
 
-warped, M = perspective_transform(binary)
+warped, M, src, dst = perspective_transform(binary)
+
+src_left_bottom_dot = src[0]
+src_left_upper_dot = src[1]
+src_right_upper_dot = src[2]
+src_right_bottom_dot = src[3]
+
+dst_left_bottom_dot = dst[0]
+dst_left_upper_dot = dst[1]
+dst_right_upper_dot = dst[2]
+dst_right_bottom_dot = dst[3]
 
 warped_lines_img = np.dstack((warped, warped, warped)) * 255
 
@@ -28,9 +38,17 @@ f.tight_layout()
 ax1.imshow(img_rgb)
 ax1.set_title('Original Image', fontsize=50)
 
+ax2.scatter(src_left_bottom_dot[0], src_left_bottom_dot[1], 60, c='red')
+ax2.scatter(src_left_upper_dot[0], src_left_upper_dot[1], 60, c='yellow')
+ax2.scatter(src_right_upper_dot[0], src_right_upper_dot[1], 60, c='green')
+ax2.scatter(src_right_bottom_dot[0], src_right_bottom_dot[1], 60, c='blue')
 ax2.imshow(lines_img)
 ax2.set_title('Binary', fontsize=50)
 
+ax3.scatter(dst_left_bottom_dot[0], dst_left_bottom_dot[1], 60, c='red')
+ax3.scatter(dst_left_upper_dot[0], dst_left_upper_dot[1], 60, c='yellow')
+ax3.scatter(dst_right_upper_dot[0], dst_right_upper_dot[1], 60, c='green')
+ax3.scatter(dst_right_bottom_dot[0], dst_right_bottom_dot[1], 60, c='blue')
 ax3.imshow(warped_lines_img)
 ax3.set_title('Warped', fontsize=50)
 plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)

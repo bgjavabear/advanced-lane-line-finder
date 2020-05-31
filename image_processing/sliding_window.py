@@ -16,7 +16,7 @@ def sliding_window(binary_warped):
     # Set the width of the windows +/- margin
     margin = 100
     # Set minimum number of pixels found to recenter window
-    minpix = 50
+    minpix = 100
 
     window_height = np.int(binary_warped.shape[0] // nwindows)
 
@@ -88,7 +88,7 @@ def fit_polynomial(binary_warped):
 
     out_img[lefty, leftx] = [255, 0, 0]
     out_img[righty, rightx] = [0, 0, 255]
-    return left_fitx, right_fitx, ploty, left_fit, right_fit, out_img
+    return left_fitx, right_fitx, ploty, out_img
 
 
 def fit_polynomial_meters(binary_warped, ym_per_px, xm_per_px):

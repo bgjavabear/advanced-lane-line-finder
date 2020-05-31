@@ -1,7 +1,7 @@
 import cv2
 
 from image_processing.mask import get_vertices, apply_mask
-from image_processing.threshold import color_threshold, channel_threshold
+from image_processing.threshold import color_threshold, channel_threshold, abs_sobel_thresh
 
 
 def find_line_edges(img, yellow_thresh=(0, 255), white_thresh=((0, 0, 0), (255, 255, 255)),
@@ -19,11 +19,11 @@ def find_line_edges(img, yellow_thresh=(0, 255), white_thresh=((0, 0, 0), (255, 
     # gradient white threshold
     hls_l = HLS[:, :, 1]
     blur_white = cv2.GaussianBlur(hls_l, (3, 3), 1)
-    canny_white = cv2.Canny(blur_white, gradient_white_thresh[0], gradient_white_thresh[1])
+    canny_white = abs_sobel_thresh(blur_white, 'x', 3, (gradient_white_thresh[0], gradient_white_thresh[1]))
     # gradient yellow threshold
     hls_s = HLS[:, :, 2]
     blur_yellow = cv2.GaussianBlur(hls_s, (3, 3), 1)
-    canny_yellow = cv2.Canny(blur_yellow, gradient_yellow_threshold[0], gradient_yellow_threshold[1])
+    canny_yellow = abs_sobel_thresh(blur_yellow, 'x', 3, (gradient_yellow_threshold[0], gradient_yellow_threshold[1]))
 
     # apply mask
     vertices = get_vertices(white_binary.shape, 1, 0.1, 0.4)

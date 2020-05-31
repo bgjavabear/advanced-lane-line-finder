@@ -6,14 +6,33 @@ import numpy as np
 from utils.geometric_utils import Line, calculate_x_by_angle
 
 
+def reverse_transform(undist, image, warped, Minv, left_fitx, right_fitx, ploty):
+    warp_zero = np.zeros_like(warped).astype(np.uint8)
+    color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+    # Recast the x and y points into usable format
+    pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+    pts = np.hstack((pts_left, pts_right))
+    cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
+
+    # Warp the blank back to original image space using inverse perspective matrix (Minv)
+    newwarp = cv2.warpPerspective(color_warp, Minv, (image.shape[1], image.shape[0]))
+
+    # Combine the reult with the original image
+    result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
+    return result
+
+
 def perspective_transform(source):
     left_line, right_line = hough_transformation(source)
     src = np.float32([[left_line.x1, left_line.y1], [left_line.x2, left_line.y2], [right_line.x2, right_line.y2],
                       [right_line.x1, right_line.y1]])
     dst = np.float32([[200, 700], [200, 300], [1000, 300], [1000, 700]])
     M = cv2.getPerspectiveTransform(src, dst)
+    Minv = cv2.getPerspectiveTransform(dst, src)
     warped = cv2.warpPerspective(source, M, source.shape[::-1], flags=cv2.INTER_LINEAR)
-    return warped, M, src, dst
+    return warped, M, Minv, src, dst
 
 
 def hough_transformation(source, rho=1, theta=np.pi / 180, threshold=20, min_line_length=0, max_line_gap=40):

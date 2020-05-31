@@ -88,4 +88,13 @@ def fit_polynomial(binary_warped):
 
     out_img[lefty, leftx] = [255, 0, 0]
     out_img[righty, rightx] = [0, 0, 255]
-    return left_fitx, right_fitx, ploty, out_img
+    return left_fitx, right_fitx, ploty, left_fit, right_fit, out_img
+
+
+def fit_polynomial_meters(binary_warped, ym_per_px, xm_per_px):
+    leftx, lefty, rightx, righty, out_img = sliding_window(binary_warped)
+
+    left_fit = np.polyfit(lefty * ym_per_px, leftx * xm_per_px, 2)
+    right_fit = np.polyfit(righty * ym_per_px, rightx * xm_per_px, 2)
+
+    return left_fit, right_fit

@@ -1,6 +1,6 @@
 import cv2
 import os
-from algorithm.lane_finder import pipeline
+from algorithm.threshold import pipeline
 from moviepy.editor import VideoFileClip
 
 image_input_path = 'data/main/test_images/'

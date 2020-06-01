@@ -24,9 +24,7 @@ def pipeline(img):
 
     # Apply a distortion correction to raw images
     undistorted_img = cv2.undistort(img, mtx, dist, None, mtx)
-    line_edges = find_line_edges(undistorted_img, yellow_thresh=(130, 255),
-                                 white_thresh=((190, 190, 190), (255, 255, 255)),
-                                 gradient_yellow_threshold=(20, 255), gradient_white_thresh=(20, 255))
+    line_edges = find_line_edges(undistorted_img)
 
     # Bird-view transform
     warped, M, Minv, src, dst = perspective_transform(line_edges)
@@ -45,6 +43,5 @@ def pipeline(img):
     output = reverse_transform(undistorted_img, img, warped, Minv, left_fitx, right_fitx, ploty)
     cv2.putText(output,
                 f'Radius of Curvature = {R:.2f}(m).Vehicle is {np.absolute(D):.2f}m {"left" if D < 0 else "right"} of '
-                f'center',
-                (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+                f'center', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
     return output

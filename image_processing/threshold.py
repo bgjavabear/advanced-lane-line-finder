@@ -42,7 +42,7 @@ def dir_threshold(S, sobel_kernel=3, thresh=(0, np.pi / 2)):
     # calculate the direction of the gradient
     theta = np.arctan2(abs_sobely, abs_sobelx)
     # Create a binary mask where direction thresholds are met
-    binary = np.zeros_like(theta)
+    binary = np.zeros_like(theta, dtype=np.uint8)
     binary[(theta >= thresh[0]) & (theta <= thresh[1])] = 1
     return binary
 

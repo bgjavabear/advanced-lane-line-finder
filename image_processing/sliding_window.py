@@ -14,9 +14,9 @@ def sliding_window(binary_warped):
     # Choose the number of sliding windows
     nwindows = 9
     # Set the width of the windows +/- margin
-    margin = 100
+    margin = 70
     # Set minimum number of pixels found to recenter window
-    minpix = 100
+    minpix = 30
 
     window_height = np.int(binary_warped.shape[0] // nwindows)
 

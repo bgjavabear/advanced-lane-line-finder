@@ -17,7 +17,7 @@ dist = calibration_result["dist"]
 img = cv2.imread('../data/main/test_images/test5.jpg')
 undistorted_img = cv2.undistort(img, mtx, dist, None, mtx)
 img_rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
-binary = find_line_edges(undistorted_img, yellow_thresh=(155, 255), white_thresh=((190, 190, 190), (255, 255, 255)))
+binary = find_line_edges(undistorted_img)
 lines_img = np.dstack((binary, binary, binary)) * 255
 
 warped, M, Minv, src, dst = perspective_transform(binary)

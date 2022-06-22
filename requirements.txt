@@ -8,7 +8,7 @@ imageio-ffmpeg==0.4.2
 kiwisolver==1.2.0
 matplotlib==3.2.1
 moviepy==1.0.3
-numpy==1.18.4
+numpy==1.22.0
 opencv-python==4.2.0.34
 Pillow==7.1.2
 proglog==0.1.9
